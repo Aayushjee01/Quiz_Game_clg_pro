@@ -89,16 +89,39 @@ function resetState() {
 
 // Start countdown
 function startTimer() {
+  timeLeft = 15;
+  timerEl.textContent = `${timeLeft}s`;
+  timerEl.style.color = "#333";
+
+    const countdown = new Audio("countdown.mp3");
+    countdown.play();
+
   timer = setInterval(() => {
     timeLeft--;
     timerEl.textContent = `${timeLeft}s`;
+
+    // 🔴 Change color in last 5 seconds
+    if (timeLeft <= 5) {
+      timerEl.style.color = "red";
+    }
+
+    // ⏰ When time runs out
     if (timeLeft <= 0) {
       clearInterval(timer);
       disableAnswers();
-      nextBtn.classList.remove("hidden");
+
+      // 🔔 Play beep sound
+      const beep = new Audio("timeout.mp3");
+      beep.play();
+
+      // 🚀 Automatically move to next question
+      setTimeout(() => {
+        nextQuestion();
+      }, 1000); // small delay for sound to play
     }
   }, 1000);
 }
+
 
 // Handle answer click
 answerBtns.forEach(btn => {
@@ -127,14 +150,15 @@ function updateProgress() {
 }
 
 // Next Question
-nextBtn.addEventListener("click", () => {
+function nextQuestion() {
   currentQuiz++;
   if (currentQuiz < quizData.length) {
     loadQuiz();
   } else {
     showResult();
   }
-});
+}
+nextBtn.addEventListener("click", nextQuestion);
 
 // Show result screen
 function showResult() {
@@ -151,3 +175,10 @@ restartBtn.addEventListener("click", () => {
   resultScreen.classList.add("hidden");
   startScreen.classList.remove("hidden");
 });
+
+
+if (timeLeft <= 5) {
+  timerEl.classList.add("red");
+} else {
+  timerEl.classList.remove("red");
+}
